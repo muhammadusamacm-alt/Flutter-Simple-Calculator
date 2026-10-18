@@ -1,6 +1,6 @@
 workflows:
   ios-debug:
-    name: iOS Debug (unsigned)
+    name: iOS Unsigned
     instance_type: mac_mini_m2
     max_build_duration: 30
     working_directory: flutter_calculator
@@ -14,9 +14,14 @@ workflows:
       - name: Install pods
         script: cd ios && pod install
       - name: Build unsigned app
-        script: flutter build ios --release --no-codesign
+        script: |
+          flutter build ios --config-only --release --no-codesign
+          cd ios
+          xcodebuild -workspace Runner.xcworkspace -scheme Runner -configuration Release -sdk iphoneos -derivedDataPath ../build/xc CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" DEVELOPMENT_TEAM="" build
       - name: Package as ipa
-        script: mkdir -p Payload && cp -R build/ios/iphoneos/Runner.app Payload/ && zip -r app-unsigned.ipa Payload
+        script: |
+          mkdir -p Payload
+          cp -R build/xc/Build/Products/Release-iphoneos/Runner.app Payload/
+          zip -r app-unsigned.ipa Payload
     artifacts:
       - flutter_calculator/app-unsigned.ipa
-      - flutter_calculator/build/ios/iphoneos/Runner.app
