@@ -12,16 +12,11 @@ workflows:
       - name: Get packages
         script: flutter pub get
       - name: Install pods
-        script: |
-          cd ios
-          pod install
-        - name: Build unsigned app
+        script: cd ios && pod install
+      - name: Build unsigned app
         script: flutter build ios --release --no-codesign
-      - name: Package as .ipa
-        script: |
-          mkdir -p Payload
-          cp -R build/ios/iphoneos/Runner.app Payload/
-          zip -r app-debug-unsigned.ipa Payload
+      - name: Package as ipa
+        script: mkdir -p Payload && cp -R build/ios/iphoneos/Runner.app Payload/ && zip -r app-unsigned.ipa Payload
     artifacts:
-      - app-debug-unsigned.ipa
-      - build/ios/iphoneos/Runner.app
+      - flutter_calculator/app-unsigned.ipa
+      - flutter_calculator/build/ios/iphoneos/Runner.app
